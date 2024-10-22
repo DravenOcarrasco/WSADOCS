@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, Link, NavLink, useLocation } from 'react-router-dom';
-import { Navbar, Nav, Container } from 'react-bootstrap';
+import { Navbar, Nav, Container, Offcanvas } from 'react-bootstrap';
 import {
   FaInfoCircle,
   FaDownload,
@@ -17,6 +17,7 @@ import {
   FaChevronDown,
   FaChevronRight,
   FaQuestionCircle,
+  FaBars, // Ícone de menu (hamburger)
 } from 'react-icons/fa'; // Importar como componentes
 import DocPage from './DocPage';
 import './App.css';
@@ -48,6 +49,10 @@ const App: React.FC = () => {
   const [routes, setRoutes] = useState<RouteItem[]>([]);
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
   const location = useLocation(); // Hook para obter a rota atual
+  const [showOffcanvas, setShowOffcanvas] = useState(false); // Estado para controlar o Offcanvas
+
+  const handleClose = () => setShowOffcanvas(false);
+  const handleShow = () => setShowOffcanvas(true);
 
   // Função para encontrar o caminho das rotas que levam à rota atual
   const findRoutePath = (
@@ -147,6 +152,7 @@ const App: React.FC = () => {
             to={route.path!} // Caminho relativo sem barra inicial
             key={`${route.title}-${index}`}
             className={`nav-link ${isActive ? 'active' : ''} ${levelClass}`}
+            onClick={() => setShowOffcanvas(false)} // Fecha o Offcanvas ao clicar no link
           >
             <span className="d-flex align-items-center">
               <IconComponent className="me-2" /> {/* Usar o componente com props */}
@@ -185,21 +191,37 @@ const App: React.FC = () => {
 
   return (
     <div className="app">
+      {/* Navbar Responsiva */}
       <Navbar bg="primary" variant="dark" expand="lg" className="mb-3">
         <Container>
           <Navbar.Brand as={Link} to="/">
             WSADOCS
           </Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          {/* Botão de Toggle para Mobile */}
+          <Navbar.Toggle aria-controls="offcanvasNavbar" onClick={handleShow}>
+            <FaBars />
+          </Navbar.Toggle>
           <Navbar.Collapse id="basic-navbar-nav">
             {/* Opcional: Adicione links de navegação aqui */}
           </Navbar.Collapse>
         </Container>
       </Navbar>
 
+      {/* Offcanvas para Menu Lateral em Mobile */}
+      <Offcanvas show={showOffcanvas} onHide={handleClose} placement="start">
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>Menu</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          <Nav className="flex-column">
+            {renderNavItems(routes)}
+          </Nav>
+        </Offcanvas.Body>
+      </Offcanvas>
+
       <div className="d-flex">
-        {/* Menu Lateral */}
-        <Nav className="flex-column sidebar bg-light p-3" style={{ minWidth: '250px' }}>
+        {/* Menu Lateral para Desktop */}
+        <Nav className="flex-column sidebar bg-light p-3 d-none d-lg-block" style={{ minWidth: '250px' }}>
           {renderNavItems(routes)}
         </Nav>
 

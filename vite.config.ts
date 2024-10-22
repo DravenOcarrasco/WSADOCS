@@ -8,4 +8,8 @@ export default defineConfig({
     mdPlugin(),
   ],
   assetsInclude: ['**/*.md'], // Inclua arquivos .md como assets
+  build: {
+    outDir: 'docs', // Define a pasta de saída para 'docs' em vez de 'dist'
+  },
+  base: './', // Define o caminho base para relativo, útil para hospedagem em subpastas
 });

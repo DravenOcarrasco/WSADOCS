@@ -103,11 +103,11 @@ const App: React.FC = () => {
       const levelClass = `level-${level}`; // Classe para indentação
 
       // Determinar se a rota atual está ativa
-      const isActive = route.path ? location.pathname === `/docs/${route.path}` : false;
+      const isActive = route.path ? location.pathname === `/${route.path}` : false;
 
       // Determinar se algum dos filhos está ativo
       const isChildActive =
-        route.children?.some((child) => child.path && location.pathname === `/docs/${child.path}`) ||
+        route.children?.some((child) => child.path && location.pathname === `/${child.path}`) ||
         false;
 
       if (route.children && route.children.length > 0) {
@@ -143,7 +143,7 @@ const App: React.FC = () => {
         return (
           <Nav.Link
             as={NavLink}
-            to={`/docs/${route.path}`}
+            to={`/${route.path}`}
             key={`${route.title}-${index}`}
             className={`nav-link ${isActive ? 'active' : ''} ${levelClass}`}
           >
@@ -167,7 +167,7 @@ const App: React.FC = () => {
           routeComponents.push(
             <Route
               key={route.path}
-              path={`/docs/${route.path}`}
+              path={`/${route.path}`}
               element={<DocPage page={route.path!} />}
             />
           );

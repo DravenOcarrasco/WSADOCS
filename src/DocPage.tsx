@@ -62,7 +62,7 @@ const DocPage: React.FC<DocPageProps> = ({ page }) => {
   const [content, setContent] = useState<string>('');
 
   useEffect(() => {
-    fetch(`/docs/${page}.md`)
+    fetch(`${import.meta.env.BASE_URL}/docs/${page}.md`)
       .then((res) => {
         if (!res.ok) {
           throw new Error('Erro ao buscar o arquivo');

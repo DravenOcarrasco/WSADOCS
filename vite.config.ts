@@ -11,5 +11,5 @@ export default defineConfig({
   build: {
     outDir: 'docs', // Define a pasta de saída para 'docs' em vez de 'dist'
   },
-  base: './', // Define o caminho base para relativo, útil para hospedagem em subpastas
+  base: '/WSADOCS/', // Define o caminho base para relativo, útil para hospedagem em subpastas
 });

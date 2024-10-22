@@ -70,13 +70,14 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    fetch(`${import.meta.env.BASE_URL}docs/docsList.json`)
+    fetch(`${import.meta.env.BASE_URL}docs/docsList.json`) // Caminho correto sem barra adicional
       .then((res) => res.json())
       .then((data: RouteItem[]) => {
         setRoutes(data);
 
         // Determinar quais menus devem estar expandidos com base na rota atual
-        const currentPath = location.pathname.replace('/docs/', '').replace(/\/$/, '');
+        const basePath = import.meta.env.BASE_URL; // '/WSADOCS/'
+        const currentPath = location.pathname.replace(basePath, '').replace(/\/$/, '');
         const path = findRoutePath(data, currentPath);
         if (path) {
           // Excluir o último item que representa a página atual
@@ -103,11 +104,11 @@ const App: React.FC = () => {
       const levelClass = `level-${level}`; // Classe para indentação
 
       // Determinar se a rota atual está ativa
-      const isActive = route.path ? location.pathname === `/${route.path}` : false;
+      const isActive = route.path ? location.pathname === `${import.meta.env.BASE_URL}${route.path}` : false;
 
       // Determinar se algum dos filhos está ativo
       const isChildActive =
-        route.children?.some((child) => child.path && location.pathname === `/${child.path}`) ||
+        route.children?.some((child) => child.path && location.pathname === `${import.meta.env.BASE_URL}${child.path}`) ||
         false;
 
       if (route.children && route.children.length > 0) {
@@ -143,7 +144,7 @@ const App: React.FC = () => {
         return (
           <Nav.Link
             as={NavLink}
-            to={`/${route.path}`}
+            to={route.path!} // Caminho relativo sem barra inicial
             key={`${route.title}-${index}`}
             className={`nav-link ${isActive ? 'active' : ''} ${levelClass}`}
           >
@@ -167,7 +168,7 @@ const App: React.FC = () => {
           routeComponents.push(
             <Route
               key={route.path}
-              path={`/${route.path}`}
+              path={route.path} // Caminho relativo sem barra inicial
               element={<DocPage page={route.path!} />}
             />
           );
@@ -184,20 +185,26 @@ const App: React.FC = () => {
 
   return (
     <div className="app">
-      <Navbar bg="primary" variant="dark">
-        <Navbar.Brand as={Link} to="/">
-          WSADOCS
-        </Navbar.Brand>
+      <Navbar bg="primary" variant="dark" expand="lg" className="mb-3">
+        <Container>
+          <Navbar.Brand as={Link} to="/">
+            WSADOCS
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            {/* Opcional: Adicione links de navegação aqui */}
+          </Navbar.Collapse>
+        </Container>
       </Navbar>
 
       <div className="d-flex">
         {/* Menu Lateral */}
-        <Nav className="flex-column sidebar bg-light p-1">
+        <Nav className="flex-column sidebar bg-light p-3" style={{ minWidth: '250px' }}>
           {renderNavItems(routes)}
         </Nav>
 
         {/* Conteúdo Principal */}
-        <Container className="content">
+        <Container className="content flex-grow-1 p-3">
           <Routes>
             {renderRoutes(routes)}
             <Route path="*" element={<h1>Welcome to WSADOCS!</h1>} />

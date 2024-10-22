@@ -1,0 +1,60 @@
+[
+    {
+        "path": "sobre",
+        "title": "Sobre",
+        "icon": "FaInfoCircle"
+    },
+    {
+        "title": "Instalação",
+        "icon": "FaDownload",
+        "children": [
+            {
+                "path": "instalacao/wsaction",
+                "title": "WSAction",
+                "icon": "FaToolbox"
+            },
+            {
+                "path": "instalacao/chrome",
+                "title": "Chrome",
+                "icon": "FaChrome"
+            }
+        ]
+    },
+    {
+        "title": "Utilização",
+        "icon": "FaPlayCircle",
+        "children": [
+            {
+                "path": "utilizacao/wsaction",
+                "title": "WSAction",
+                "icon": "FaToolbox"
+            },
+            {
+                "path": "utilizacao/sistema-de-relay",
+                "title": "Sistema de Relay",
+                "icon": "FaNetworkWired"
+            }
+        ]
+    },
+    {
+        "title": "Parte Técnica",
+        "icon": "FaCogs",
+        "children": [
+            {
+                "path": "parte-tecnica/criador-de-contexto",
+                "title": "Criador de Contexto",
+                "icon": "FaEdit"
+            },
+            {
+                "path": "parte-tecnica/criacao-de-extensao",
+                "title": "Criação de Extensão",
+                "icon": "FaPlusCircle"
+            },
+            {
+                "path": "parte-tecnica/gerenciador-de-contextos",
+                "title": "Gerenciador de Contextos",
+                "icon": "FaTasks"
+            }
+        ]
+    }
+]

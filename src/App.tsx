@@ -70,7 +70,7 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    fetch(`${import.meta.env.BASE_URL}/docs/docsList.json`)
+    fetch(`${import.meta.env.BASE_URL}docs/docsList.json`)
       .then((res) => res.json())
       .then((data: RouteItem[]) => {
         setRoutes(data);

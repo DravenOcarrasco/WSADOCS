@@ -1,17 +1,18 @@
+// src/DocPage.tsx
+
+import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import remarkEmoji from 'remark-emoji';
-// Remove remark-slug import
-// import remarkSlug from 'remark-slug';
 import rehypeKatex from 'rehype-katex';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeRaw from 'rehype-raw';
-import rehypeSlug from 'rehype-slug'; // Import rehype-slug
-import { useState, useEffect } from 'react';
+import rehypeSlug from 'rehype-slug';
 import { useNavigate } from 'react-router-dom';
 import 'katex/dist/katex.min.css';
 import 'highlight.js/styles/github.css';
+// import './DocPage.css'; // Se desejar adicionar estilos específicos
 
 interface DocPageProps {
   page: string;
@@ -62,7 +63,8 @@ const DocPage: React.FC<DocPageProps> = ({ page }) => {
   const [content, setContent] = useState<string>('');
 
   useEffect(() => {
-    fetch(`${import.meta.env.BASE_URL}/docs/${page}.md`)
+    // Use import.meta.env.BASE_URL para caminhos relativos
+    fetch(`${import.meta.env.BASE_URL}docs/${page}.md`)
       .then((res) => {
         if (!res.ok) {
           throw new Error('Erro ao buscar o arquivo');
@@ -75,12 +77,35 @@ const DocPage: React.FC<DocPageProps> = ({ page }) => {
 
   const components = {
     button: ({ node }: any) => {
-      const linkNode = node.children[0];
-      const href = linkNode?.properties?.href || '#';
+      // Verifique se o botão possui filhos
+      const hasChildren = node.children && node.children.length > 0;
+
+      if (hasChildren) {
+        const linkNode = node.children[0];
+        const href = linkNode?.properties?.href || '#';
+        const buttonText =
+          linkNode.children && linkNode.children.length > 0
+            ? linkNode.children[0].value
+            : 'Button';
+
+        return <MarkdownButton to={href}>{buttonText}</MarkdownButton>;
+      } else {
+        // Renderiza um botão padrão caso não haja filhos
+        return <MarkdownButton to="#">Button</MarkdownButton>;
+      }
+    },
+    a: ({ node, href, children }: any) => {
+      // Opcional: estilizar links que devem parecer botões
+      const isButton = node.properties?.className?.includes('btn');
+
+      if (isButton) {
+        return <MarkdownButton to={href || '#'}>{children}</MarkdownButton>;
+      }
+
       return (
-        <MarkdownButton to={href}>
-          {linkNode.children[0].value}
-        </MarkdownButton>
+        <a href={href} className="standard-link">
+          {children}
+        </a>
       );
     },
   };
@@ -88,7 +113,7 @@ const DocPage: React.FC<DocPageProps> = ({ page }) => {
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm, remarkMath, remarkEmoji]}
-      rehypePlugins={[rehypeKatex, rehypeHighlight, rehypeRaw, rehypeSlug]} // Add rehypeSlug here
+      rehypePlugins={[rehypeKatex, rehypeHighlight, rehypeRaw, rehypeSlug]}
       components={components}
     >
       {content}

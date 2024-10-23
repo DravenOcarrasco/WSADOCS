@@ -1,8 +1,8 @@
 [
     {
-        "path": "sobre",
-        "title": "Sobre",
-        "icon": "FaInfoCircle"
+        "path": "",
+        "title": "Home",
+        "icon": "FaHome"
     },
     {
         "title": "Instalação",
@@ -30,9 +30,20 @@
                 "icon": "FaToolbox"
             },
             {
-                "path": "utilizacao/sistema-de-relay",
                 "title": "Sistema de Relay",
-                "icon": "FaNetworkWired"
+                "icon": "FaNetworkWired",
+                "children": [
+                    {
+                        "path": "utilizacao/relay/config",
+                        "title": "Config",
+                        "icon": "FaToolbox"
+                    },
+                    {
+                        "path": "utilizacao/sistema-de-relay",
+                        "title": "Utilização",
+                        "icon": "FaToolbox"
+                    }
+                ]
             }
         ]
     },
@@ -40,6 +51,11 @@
         "title": "Parte Técnica",
         "icon": "FaCogs",
         "children": [
+            {
+                "path": "parte-tecnica/injetor",
+                "title": "Como o Injetor Funciona",
+                "icon": "BiSolidInjection"
+            },
             {
                 "path": "parte-tecnica/criador-de-contexto",
                 "title": "Criador de Contexto",

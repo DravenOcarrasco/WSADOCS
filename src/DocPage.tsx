@@ -12,7 +12,7 @@ import rehypeSlug from 'rehype-slug';
 import { useNavigate } from 'react-router-dom';
 import 'katex/dist/katex.min.css';
 import 'highlight.js/styles/github.css';
-// import './DocPage.css'; // Se desejar adicionar estilos específicos
+import './DocPage.css'; // Importe os estilos específicos
 
 interface DocPageProps {
   page: string;

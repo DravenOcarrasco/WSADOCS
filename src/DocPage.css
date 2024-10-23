@@ -1,0 +1,49 @@
+/* DocPage.css */
+
+/* Estilos gerais para tabelas */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1em;
+}
+
+/* Estilos para cabeçalhos e células da tabela */
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 16px 20px;
+    /* Aumenta o espaçamento interno das células */
+    text-align: left;
+}
+
+/* Estilos para cabeçalhos */
+th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+/* Estilos para linhas alternadas */
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Estilos para hover nas linhas */
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Estilos para links padrão */
+.standard-link {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.standard-link:hover {
+    text-decoration: underline;
+}
+
+/* Estilos para botões gerados pelo MarkdownButton */
+button {
+    /* Herda estilos do componente React */
+    /* Adicione estilos adicionais se necessário */
+}

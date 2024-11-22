@@ -12,7 +12,7 @@ import rehypeSlug from 'rehype-slug';
 import { useNavigate } from 'react-router-dom';
 import 'katex/dist/katex.min.css';
 import 'highlight.js/styles/github.css';
-import './DocPage.css'; // Importe os estilos específicos
+import './DocPage.css';
 
 interface DocPageProps {
   page: string;
@@ -23,37 +23,38 @@ interface ButtonProps {
   children: React.ReactNode;
 }
 
-// Define styles
-const styles = {
-  button: {
-    padding: '10px 15px',
-    backgroundColor: '#007bff',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-  },
-};
+const LoadingSpinner: React.FC = () => (
+  <div className="loading-container">
+    <div className="loading-spinner"></div>
+    <p>Carregando...</p>
+  </div>
+);
+
+const ErrorMessage: React.FC<{ message: string }> = ({ message }) => (
+  <div className="error-container">
+    <div className="error-icon">⚠️</div>
+    <h2>Ops! Algo deu errado</h2>
+    <p>{message}</p>
+  </div>
+);
 
 const MarkdownButton: React.FC<ButtonProps> = ({ to, children }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
     if (to.startsWith('#')) {
-      // Scroll to the anchor in the same document
       const id = to.substring(1);
       const element = document.getElementById(id);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
       }
     } else {
-      // Navigate to another route
       navigate(to);
     }
   };
 
   return (
-    <button onClick={handleClick} style={styles.button}>
+    <button onClick={handleClick} className="markdown-button">
       {children}
     </button>
   );
@@ -61,23 +62,34 @@ const MarkdownButton: React.FC<ButtonProps> = ({ to, children }) => {
 
 const DocPage: React.FC<DocPageProps> = ({ page }) => {
   const [content, setContent] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Use import.meta.env.BASE_URL para caminhos relativos
-    fetch(`${import.meta.env.BASE_URL}docs/${page}.md`)
+    setIsLoading(true);
+    setError(null);
+
+    fetch(`${import.meta.env.BASE_URL}docs/${page}`)
       .then((res) => {
         if (!res.ok) {
-          throw new Error('Erro ao buscar o arquivo');
+          throw new Error(res.status === 404 
+            ? 'Página não encontrada' 
+            : 'Erro ao carregar o conteúdo');
         }
         return res.text();
       })
-      .then((text) => setContent(text))
-      .catch(() => setContent('Página não encontrada'));
+      .then((text) => {
+        setContent(text);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setIsLoading(false);
+      });
   }, [page]);
 
   const components = {
     button: ({ node }: any) => {
-      // Verifique se o botão possui filhos
       const hasChildren = node.children && node.children.length > 0;
 
       if (hasChildren) {
@@ -89,13 +101,11 @@ const DocPage: React.FC<DocPageProps> = ({ page }) => {
             : 'Button';
 
         return <MarkdownButton to={href}>{buttonText}</MarkdownButton>;
-      } else {
-        // Renderiza um botão padrão caso não haja filhos
-        return <MarkdownButton to="#">Button</MarkdownButton>;
       }
+
+      return <MarkdownButton to="#">Button</MarkdownButton>;
     },
     a: ({ node, href, children }: any) => {
-      // Opcional: estilizar links que devem parecer botões
       const isButton = node.properties?.className?.includes('btn');
 
       if (isButton) {
@@ -110,14 +120,24 @@ const DocPage: React.FC<DocPageProps> = ({ page }) => {
     },
   };
 
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return <ErrorMessage message={error} />;
+  }
+
   return (
-    <ReactMarkdown
-      remarkPlugins={[remarkGfm, remarkMath, remarkEmoji]}
-      rehypePlugins={[rehypeKatex, rehypeHighlight, rehypeRaw, rehypeSlug]}
-      components={components}
-    >
-      {content}
-    </ReactMarkdown>
+    <div className="markdown-container">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm, remarkMath, remarkEmoji]}
+        rehypePlugins={[rehypeKatex, rehypeHighlight, rehypeRaw, rehypeSlug]}
+        components={components}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
   );
 };
 

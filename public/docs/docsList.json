@@ -1,22 +1,32 @@
 [
     {
-        "path": "",
-        "title": "Home",
+        "path": ".md",
+        "title": "WSAction",
         "icon": "FaHome"
     },
     {
-        "title": "Instalação",
-        "icon": "FaDownload",
+        "title": "Parte Técnica",
+        "icon": "FaCogs",
         "children": [
             {
-                "path": "instalacao/wsaction",
-                "title": "WSAction",
-                "icon": "FaToolbox"
+                "path": "parte-tecnica/criacao-de-extensao.md",
+                "title": "Criação de Extensão",
+                "icon": "FaPlusCircle"
             },
             {
-                "path": "instalacao/chrome",
-                "title": "Chrome",
-                "icon": "FaChrome"
+                "path": "parte-tecnica/criador-de-contexto.md",
+                "title": "Criador de Contexto",
+                "icon": "FaEdit"
+            },
+            {
+                "path": "parte-tecnica/gerenciador-de-contextos.md",
+                "title": "Gerenciador de Contextos",
+                "icon": "FaTasks"
+            },
+            {
+                "path": "parte-tecnica/injetor.md",
+                "title": "Como o Injetor Funciona",
+                "icon": "BiSolidInjection"
             }
         ]
     },
@@ -25,51 +35,20 @@
         "icon": "FaPlayCircle",
         "children": [
             {
-                "path": "utilizacao/wsaction",
-                "title": "WSAction",
-                "icon": "FaToolbox"
-            },
-            {
                 "title": "Sistema de Relay",
                 "icon": "FaNetworkWired",
                 "children": [
                     {
-                        "path": "utilizacao/relay/config",
+                        "path": "utilizacao/relay/config.md",
                         "title": "Config",
                         "icon": "FaToolbox"
                     },
                     {
-                        "path": "utilizacao/sistema-de-relay",
+                        "path": "utilizacao/relay/sistema-de-relay.md",
                         "title": "Utilização",
                         "icon": "FaToolbox"
                     }
                 ]
-            }
-        ]
-    },
-    {
-        "title": "Parte Técnica",
-        "icon": "FaCogs",
-        "children": [
-            {
-                "path": "parte-tecnica/injetor",
-                "title": "Como o Injetor Funciona",
-                "icon": "BiSolidInjection"
-            },
-            {
-                "path": "parte-tecnica/criador-de-contexto",
-                "title": "Criador de Contexto",
-                "icon": "FaEdit"
-            },
-            {
-                "path": "parte-tecnica/criacao-de-extensao",
-                "title": "Criação de Extensão",
-                "icon": "FaPlusCircle"
-            },
-            {
-                "path": "parte-tecnica/gerenciador-de-contextos",
-                "title": "Gerenciador de Contextos",
-                "icon": "FaTasks"
             }
         ]
     }

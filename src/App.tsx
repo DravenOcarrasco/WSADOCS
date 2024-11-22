@@ -1,7 +1,7 @@
 // src/App.tsx
 
 import React, { useEffect, useState } from 'react';
-import { Routes, Route, Link, NavLink, useLocation } from 'react-router-dom';
+import { Routes, Route, Link, NavLink, useLocation, Navigate } from 'react-router-dom';
 import { Navbar, Nav, Container, Offcanvas } from 'react-bootstrap';
 import * as FaIcons from 'react-icons/fa'; // Font Awesome Icons
 import * as BiIcons from 'react-icons/bi'; // BoxIcons
@@ -220,8 +220,8 @@ const App: React.FC = () => {
 				{/* Conteúdo Principal */}
 				<Container className="content flex-grow-1 p-3">
 					<Routes>
+						<Route path="/" element={<Navigate to=".md" replace />} />
 						{renderRoutes(routes)}
-						{/* <Route path="*" element={<h1>Welcome to WSADOCS!</h1>} /> */}
 					</Routes>
 				</Container>
 			</div>

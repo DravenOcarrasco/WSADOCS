@@ -12,26 +12,46 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: #f8f9fa;
 }
 
 .d-flex {
   flex: 1;
 }
 
+/* Navbar customization */
+.navbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%) !important;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: 0.5px;
+}
+
 /* Sidebar */
 .sidebar {
-  width: 250px;
+  width: 280px;
   overflow-y: auto;
-  height: calc(100vh - 56px); /* Altura da Navbar */
-  border-right: 1px solid #dee2e6;
+  height: calc(100vh - 56px);
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: white;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem 0 !important;
 }
 
 /* Conteúdo principal */
 .content {
   flex: 1;
-  padding: 20px;
+  padding: 2rem !important;
   overflow-y: auto;
-  height: calc(100vh - 56px); /* Altura da Navbar */
+  height: calc(100vh - 56px);
+  background-color: white;
+  margin: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 /* Itens do menu */
@@ -39,63 +59,97 @@
   user-select: none;
   display: flex;
   align-items: center;
+  margin: 0.25rem 0;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
 /* Links do menu */
 .nav-link {
   display: flex;
   align-items: center;
-  padding: 10px 15px;
-  color: #333;
-  font-size: 1rem;
+  padding: 0.75rem 1.25rem;
+  color: #495057;
+  font-size: 0.95rem;
   text-decoration: none;
   width: 100%;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
 .nav-link:hover {
-  background-color: #e9ecef;
-  color: #007bff;
+  background-color: #f8f9fa;
+  color: #0d6efd;
+  transform: translateX(4px);
 }
 
 /* Ícone de expansão */
 .expand-icon {
-  margin-right: 15px;
+  margin-right: 1rem;
+  font-size: 0.8rem;
+  color: #6c757d;
+  transition: transform 0.2s ease;
 }
 
 /* Estilos para níveis de indentação */
 .level-0 {
-  padding-left: 0px;
+  padding-left: 0.5rem;
 }
 
 .level-1 {
-  padding-left: 20px;
+  padding-left: 1.5rem;
 }
 
 .level-2 {
-  padding-left: 40px;
+  padding-left: 2.5rem;
 }
 
 .level-3 {
-  padding-left: 60px;
+  padding-left: 3.5rem;
 }
 
 /* Estilos para itens ativos */
 .nav-link.active {
-  background-color: #007bff;
+  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
   color: white;
-  font-weight: bold;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(13, 110, 253, 0.2);
 }
 
 /* Estilos para menus pais ativos */
 .active-parent .nav-link {
-  background-color: #dfe3e6;
-  color: #007bff;
-  font-weight: bold;
+  background-color: #e9ecef;
+  color: #0d6efd;
+  font-weight: 600;
 }
 
-/* Responsividade: esconder a sidebar em telas menores */
+/* Offcanvas customization */
+.offcanvas {
+  border-right: none;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.offcanvas-header {
+  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+  color: white;
+}
+
+.offcanvas-title {
+  font-weight: 600;
+}
+
+.btn-close {
+  filter: brightness(0) invert(1);
+}
+
+/* Responsividade */
 @media (max-width: 768px) {
   .sidebar {
     display: none;
+  }
+  
+  .content {
+    margin: 0.5rem;
+    padding: 1rem !important;
   }
 }

@@ -1,209 +1,316 @@
-Aqui está o guia completo em Markdown, incluindo a explicação sobre os comandos de CLI no `index.js` e mencionando que as funções terão documentação de retorno:
-
----
-
-# Guia de Criação de uma Extensão no WSAction
-
-Este guia explica como criar uma extensão no WSAction e descreve a estrutura de arquivos da extensão, com ênfase no registro de comandos CLI no `index.js`.
+# Guia Completo de Desenvolvimento de Extensões WSActions
 
 ## Sumário
+- [Estrutura Básica](#estrutura-básica)
+  - [Arquivos Necessários](#1-arquivos-necessários)
+  - [Metadados (meta.json)](#2-metadados-metajson)
+- [Arquitetura Cliente-Servidor](#arquitetura-cliente-servidor)
+  - [Cliente (client.js)](#1-cliente-clientjs)
+  - [Servidor (index.js)](#2-servidor-indexjs)
+- [Sistema de Armazenamento](#sistema-de-armazenamento)
+  - [Storage por Perfil](#1-storage-por-perfil)
+  - [Storage Global](#2-storage-global)
+  - [Boas Práticas de Storage](#3-boas-práticas-de-storage)
+- [Comunicação](#comunicação)
+  - [Cliente para Servidor](#1-cliente-para-servidor)
+  - [Servidor para Cliente(s)](#2-servidor-para-clientes)
+  - [Acesso a Outras Extensões](#3-acesso-a-outras-extensões)
+- [Exemplos Completos](#exemplos-completos)
+  - [Extensão Básica](#1-extensão-básica)
+  - [Gerenciamento de Estado e UI](#2-gerenciamento-de-estado-e-ui)
+- [Boas Práticas](#boas-práticas)
+- [Notas Finais](#notas-finais)
 
-1. [Introdução](#introdução)
-2. [Como Criar uma Extensão](#como-criar-uma-extensão)
-   - [Usando o Executável WSAction](#usando-o-executável-wsaction)
-   - [Usando o Atalho WSAction](#usando-o-atalho-wsaction)
-3. [Estrutura de Arquivos da Extensão](#estrutura-de-arquivos-da-extensão)
-   - [`client.js`](#clientjs)
-   - [`index.js`](#indexjs)
-   - [`meta.json`](#metajson)
-4. [Comandos de CLI no `index.js`](#comandos-de-cli-no-indexjs)
+## Estrutura Básica
 
----
-
-## Introdução
-
-O WSAction permite a criação de extensões personalizadas, que interagem com o cliente (navegador) e o servidor (Node.js). Além disso, você pode registrar comandos de linha de comando (CLI) no lado do servidor para interagir com o WebSocket e controlar a lógica da extensão.
-
-## Como Criar uma Extensão
-
-Há duas formas de criar uma extensão no WSAction:
-
-### Usando o Executável WSAction
-
-1. **Abra o terminal ou prompt de comando**:
-   Execute o executável do WSAction com o seguinte comando:
-
-   ```bash
-   wsaction.exe create-extension
-   ```
-
-2. **Nome da Extensão**:
-   O WSAction pedirá para você fornecer o nome da sua extensão. Digite o nome desejado e pressione `Enter`.
-
-3. **Extensão Criada**:
-   A extensão será criada na pasta `extensions/nome_da_extensao`, contendo os arquivos necessários: `client.js`, `index.js`, e `meta.json`.
-
-### Usando o Atalho WSAction
-
-Há um atalho que pode ser utilizado para pular a etapa de passar parâmetros:
-
-1. **Clique no atalho "Create Extension"**:
-   Esse atalho está localizado na pasta do WSAction.
-
-2. **Nome da Extensão**:
-   Você será solicitado a fornecer o nome da extensão.
-
-3. **Extensão Criada**:
-   A estrutura da extensão será gerada automaticamente, como no método anterior.
-
----
-
-## Estrutura de Arquivos da Extensão
-
-Após a criação da extensão, você encontrará três arquivos principais dentro da pasta da extensão:
-
-- **`client.js`**: Script que roda no navegador.
-- **`index.js`**: Script que roda no servidor.
-- **`meta.json`**: Arquivo de metadados que define as informações da extensão.
-
-### `client.js`
-
-Este script roda no lado do cliente (navegador), lidando com a lógica de comunicação via WebSocket.
-
-#### Exemplo:
-
-```javascript
-(async function () {
-    const CONTEXT = window.WSACTION.createModuleContext("EXAMPLE");
-    const SOCKET = CONTEXT.SOCKET;
-
-    SOCKET.on('connect', () => {
-        console.log(`${CONTEXT.MODULE_NAME} conectado ao WebSocket`);
-        CONTEXT.ioEmit("join", { MODULE_NAME: CONTEXT.MODULE_NAME });
-    });
-
-    CONTEXT.ioEmit('sendMessage', { message: 'Hello WebSocket!' });
-    await CONTEXT.register();
-})();
+### 1. Arquivos Necessários
+```
+MinhaExtensao/
+  ├── client.js     # Código do lado do cliente
+  ├── index.js      # Código do lado do servidor
+  ├── meta.json     # Metadados da extensão
+  └── icon.png      # Ícone da extensão
 ```
 
-Esse arquivo conecta-se ao servidor WebSocket e emite eventos como `sendMessage` e `join` quando o cliente é carregado.
-
-### `index.js`
-
-Este arquivo contém a lógica do servidor, incluindo a definição de eventos WebSocket e comandos CLI. Também mencionaremos que as funções terão documentação sobre seus retornos, facilitando o entendimento dos dados processados.
-
-#### Exemplo:
-
-```javascript
-/**
- * Módulo da extensão.
- * 
- * @param {import('socket.io').Server} WSIO - Instância do WebSocket IO.
- * @param {import('express').Application} APP - Instância do Express.
- * @param {import('readline').Interface} RL - Instância do Readline.
- * @param {Object} STORAGE - Objeto de armazenamento compartilhado.
- * @param {Object} STORAGE.data - Objeto que contém os dados de armazenamento.
- * @param {Function} STORAGE.save - Função que salva o armazenamento.
- * @param {typeof import('express')} EXPRESS - Classe Express.
- * @param {Array<string>} [WEB_SCRIPTS=['client.js']] - Lista de scripts JavaScript a serem carregados dinamicamente.
- * @param {string} EXTENSION_PATH - Caminho absoluto para a pasta da extensão
- * 
- * @returns {{ start: Function, stop: Function }} - Objeto da extensão com funções `start` e `stop`.
- */
-module.exports = (WSIO, APP, RL, STORAGE, EXPRESS, WEB_SCRIPTS = ['client.js'], EXTENSION_PATH = '') => {
-    const ENABLED = true;
-    const NAME = "EXAMPLE";
-    const CLIENT_LINK = `${NAME}/client`;
-    var WEB_SCRIPTS = WEB_SCRIPTS;
-    var EXTENSION_PATH = EXTENSION_PATH;
-    const ROUTER = EXPRESS.Router();
-
-    CONTEXT.KEYBOARD_COMMANDS = {}
-
-    // Definindo os eventos do WebSocket
-    const IOEVENTS = {
-        "sendMessage": {
-            description: "Envio de uma mensagem de texto para o servidor WebSocket.",
-            _function: (data) => {
-                WSIO.emit(`${NAME}:sendMessage`, { message: data });
-            },
-            // Retorna uma mensagem de confirmação
-            returns: "Objeto contendo o status da mensagem enviada"
-        }
-    };
-
-    const onInitialize = () => {
-        console.log(`${NAME} initialized.`);
-    };
-
-    const onError = (error) => {
-        console.error(`${NAME} error: ${error.message}`);
-    };
-
-    return {
-        NAME,
-        ROUTER,
-        ENABLED,
-        IOEVENTS,
-        CLIENT_LINK,
-        EXTENSION_PATH,
-        WEB_SCRIPTS,
-        onInitialize,
-        onError
-    };
-};
-```
-
-### `meta.json`
-
-Contém as configurações essenciais da extensão, como nome, versão, scripts a serem carregados no navegador, e compatibilidade com versões do WSAction.
-
-#### Exemplo do `meta.json`:
-
+### 2. Metadados (meta.json)
 ```json
 {
-    "name": "EXAMPLE",
+    "name": "MinhaExtensao",
     "version": "1.0.0",
-    "github": "https://github.com/myextension",
-    "minVersion": "2.10.0-BETA-1",
-    "compatibility": [
-        "2.10.0-BETA-1"
-    ],
-    "id": "172969167245420jiun9x8-TEMP",
-    "WEB_SCRIPTS": [
-        "client.js"
-    ]
+    "github": "https://github.com/seu-repo",
+    "minVersion": "2.7.0-BETA",
+    "compatibility": ["2.7.0-BETA"],
+    "id": "1234567890abc-TEMP",
+    "WEB_SCRIPTS": ["client.js"]
 }
 ```
 
----
+#### Campos Obrigatórios
+- `name`: Nome da extensão
+- `version`: Versão atual
+- `minVersion`: Versão mínima do WSActions necessária
+- `WEB_SCRIPTS`: Array de scripts do cliente a serem carregados
 
-## Comandos de CLI no `index.js`
+#### Campos Opcionais
+- `github`: URL do repositório
+- `compatibility`: Array de versões compatíveis
+- `id`: Identificador único (gerado automaticamente se não fornecido)
 
-O `index.js` permite definir comandos de CLI usando a instância `readline` (`RL`). Esses comandos podem ser usados para interagir com o servidor diretamente a partir do terminal. Aqui está um exemplo de como os comandos são definidos:
+## Arquitetura Cliente-Servidor
 
-#### Exemplo de comandos CLI:
+### 1. Cliente (client.js)
+- Executa no navegador
+- Controle da interface do usuário
+- Manipulação do DOM
+- Interação com o navegador
+- Atalhos de teclado
+- Interface visual (SweetAlert2)
+
+### 2. Servidor (index.js)
+- Executa na máquina local
+- Acesso ao sistema de arquivos
+- Gerenciamento de WebSocket
+- Controle da máquina
+- Comunicação entre perfis
+- Persistência de dados
+
+## Sistema de Armazenamento
+
+### 1. Storage por Perfil
+```javascript
+// No client.js
+await CONTEXT.setStorage('minhaChave', valor);
+const dadosPerfil = await CONTEXT.getStorage('minhaChave');
+```
+
+### 2. Storage Global
+```javascript
+// Compartilhado entre todos os perfis
+await CONTEXT.setVariable('minhaVar', valor, true); // true = global
+const dadosGlobais = await CONTEXT.getVariable('minhaVar', valorPadrao, true);
+```
+
+### 3. Boas Práticas de Storage
+- Use storage por perfil para dados específicos do usuário
+- Use storage global para configurações compartilhadas
+- Evite usar storage para passar dados ao servidor
+- Passe dados necessários diretamente nos eventos
+- Limpe dados obsoletos
+
+## Comunicação
+
+### 1. Cliente para Servidor
+```javascript
+// No client.js
+CONTEXT.ioEmit('evento', {
+    dados: valor,
+    outrosDados: outroValor
+});
+```
+
+### 2. Servidor para Cliente(s)
+```javascript
+// No index.js
+IOEVENTS: {
+    "evento": {
+        description: "Descrição do evento",
+        _function: (data) => {
+            // Para um cliente específico
+            WSIO.to(ID).emit('resposta', data);
+            
+            // Para todos os clientes
+            WSIO.emit('broadcast', data);
+        }
+    }
+}
+```
+
+### 3. Acesso a Outras Extensões
+```javascript
+// No client.js - Acesso assíncrono
+const extension = await WSACTION.CONTEXT_MANAGER.getExtension("NOME_EXTENSAO");
+await extension.PUBLIC.metodo();
+```
+
+## Exemplos Completos
+
+### 1. Extensão Básica
 
 ```javascript
-CONTEXT.KEYBOARD_COMMANDS = {
-    "exampleCommand": {
-        description: "Envia uma mensagem via WebSocket.",
-        _function: () => {
-            RL.question('Digite uma mensagem para enviar: ', (input) => {
-                WSIO.emit(`${NAME}:sendMessage`, { message: input });
-            });
-        },
-        // Retorno esperado: Confirmação da mensagem enviada
-        returns: "Objeto contendo o status da mensagem enviada"
-    },
+// meta.json
+{
+    "name": "MinhaExtensao",
+    "version": "1.0.0",
+    "WEB_SCRIPTS": ["client.js"]
+}
+
+// index.js
+module.exports = ({WSIO, APP, RL, STORAGE, EXPRESS, WEB_SCRIPTS, EXTENSION_PATH, ID}) => {
+    const ENABLED = true;
+    const NAME = "MINHAEXTENSAO";
+    const CLIENT_LINK = `${NAME}/client`;
+    const ROUTER = EXPRESS.Router();
+
+    const IOEVENTS = {
+        "getData": {
+            description: "Busca dados",
+            _function: async (data) => {
+                try {
+                    const result = await processData(data);
+                    WSIO.to(ID).emit('dataResult', result);
+                } catch (error) {
+                    WSIO.to(ID).emit('error', { message: error.message });
+                }
+            }
+        }
+    };
+
+    return {
+        NAME, ROUTER, ENABLED, IOEVENTS,
+        CLIENT_LINK, EXTENSION_PATH, WEB_SCRIPTS, ID
+    };
+};
+
+// client.js
+(async function (EXTENSION_ID, SHARED_CONTEXT) {
+    const CONTEXT = createContext("MINHAEXTENSAO", EXTENSION_ID);
+    const SOCKET = CONTEXT.SOCKET;
+
+    let STATE = {
+        isActive: false,
+        data: null
+    };
+
+    SOCKET.on('connect', () => {
+        console.log('Connected');
+        initializeExtension();
+    });
+
+    SOCKET.on('dataResult', async (data) => {
+        STATE.data = data;
+        await updateUI(data);
+    });
+
+    CONTEXT.KEYBOARD_COMMANDS = [
+        {
+            description: "Ativar",
+            keys: [
+                { key: "ctrlKey", uppercase: false },
+                { key: "altKey", uppercase: false },
+                { key: "a", uppercase: false }
+            ],
+            function: async () => {
+                await toggleFunction();
+            }
+        }
+    ];
+
+    CONTEXT.PUBLIC = {
+        isActive: () => STATE.isActive,
+        getData: () => STATE.data,
+        
+        async processData(data) {
+            CONTEXT.ioEmit('getData', data);
+        }
+    };
+
+    async function initializeExtension() {
+        // Carregar configurações do perfil
+        const config = await CONTEXT.getStorage('config');
+        if (config) {
+            STATE.data = config;
+        }
+
+        // Carregar dados globais
+        const globalData = await CONTEXT.getVariable('globalConfig', {}, true);
+        
+        // Inicializar
+        STATE.isActive = true;
+    }
+
+    await CONTEXT.register();
+})(EXTENSION_ID, SHARED_CONTEXT);
+```
+
+### 2. Gerenciamento de Estado e UI
+
+```javascript
+// No client.js
+CONTEXT.PUBLIC = {
+    async showInterface() {
+        const result = await Swal.fire({
+            title: 'Configuração',
+            html: `
+                <div class="form-group">
+                    <label>Opção</label>
+                    <input id="option1" class="swal2-input">
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Salvar'
+        });
+
+        if (result.isConfirmed) {
+            const option = document.getElementById('option1').value;
+            
+            // Salvar no perfil
+            await CONTEXT.setStorage('options', { option });
+            
+            // Salvar global
+            await CONTEXT.setVariable('globalOptions', { option }, true);
+            
+            // Notificar servidor
+            CONTEXT.ioEmit('optionsUpdated', { option });
+        }
+    }
 };
 ```
 
-### Como Funciona:
+## Boas Práticas
 
-- **`exampleCommand`**: Solicita uma mensagem ao usuário via terminal e envia essa mensagem ao servidor via WebSocket.
+1. **Organização**
+   - Use nomes descritivos em maiúsculas
+   - Mantenha estado em objeto centralizado
+   - Documente funções públicas
 
-Esses comandos são úteis para controlar o comportamento da extensão via terminal, sem precisar editar o código diretamente.
+2. **Comunicação**
+   - Passe dados necessários nos eventos
+   - Use broadcast com moderação
+   - Valide dados recebidos
 
----
+3. **Storage**
+   - Use perfil para dados individuais
+   - Use global para dados compartilhados
+   - Limpe dados não utilizados
+
+4. **Interface**
+   - Use SweetAlert2 para modais
+   - Forneça feedback visual
+   - Mantenha consistência visual
+
+5. **Segurança**
+   - Valide dados de entrada
+   - Evite dados sensíveis
+   - Use HTTPS quando necessário
+
+## Notas Finais
+
+1. **Ciclo de Vida**
+   - Inicialização: Criar contexto e configurar eventos
+   - Execução: Gerenciar estado e comunicação
+   - Finalização: Limpar recursos e salvar estado
+
+2. **Debug**
+   - Use console.log com moderação
+   - Trate erros adequadamente
+   - Forneça feedback ao usuário
+
+3. **Performance**
+   - Evite polling desnecessário
+   - Use armazenamento local quando possível
+   - Limpe listeners não utilizados
+
+4. **Compatibilidade**
+   - Verifique versão mínima requerida
+   - Teste em diferentes versões do WSActions
+   - Mantenha retrocompatibilidade quando possível
